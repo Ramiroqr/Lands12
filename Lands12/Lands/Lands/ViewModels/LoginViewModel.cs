@@ -16,8 +16,8 @@ namespace Lands.ViewModels
         #region Properties
         public string Email
         {
-            get;
-            set;
+            get { return this.email; }
+            set { SetValue(ref this.email, value); }
         }
 
         public string Password
