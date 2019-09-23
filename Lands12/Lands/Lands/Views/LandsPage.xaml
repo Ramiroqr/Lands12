@@ -8,6 +8,14 @@
         <StackLayout
             BindingContext="{Binding Lands}"
             Padding="10">
+            <SearchBar
+                BackgroundColor="Beige"
+                HeightRequest="42"
+                Text="{Binding Filter, Mode=TwoWay}"
+                Placeholder="Search..."
+                SearchCommand="{Binding SearchCommand}">
+                
+            </SearchBar>
             <ListView
                 HasUnevenRows="True"
                 IsPullToRefreshEnabled="True"
@@ -39,7 +47,7 @@
                                 <Image
                                     Grid.Column="1"
                                     HorizontalOptions="End"
-                                    Source="ic_Chevron_right">
+                                    Source="ic_chevron_right">
                                     
                                 </Image>
                             </Grid>

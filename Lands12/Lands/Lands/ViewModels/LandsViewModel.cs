@@ -3,8 +3,10 @@
     using GalaSoft.MvvmLight.Command;
     using Lands.Models;
     using Lands.Services;
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Windows.Input;
     using Xamarin.Forms;
 
@@ -17,6 +19,8 @@
         #region Attributes
         private ObservableCollection<Land> lands;
         private bool isRefreshing;
+        private string filter;
+        private List<Land> landsList;
         #endregion
 
         #region Properties
@@ -26,13 +30,6 @@
             get { return this.lands; }
             set { SetValue(ref this.lands, value); }
         }
-        #endregion
-        #region Constructors
-        public LandsViewModel()
-        {
-            this.apiService = new ApiService();
-            this.LoadLands();
-        }
 
         public bool IsRefreshing
         {
@@ -40,6 +37,22 @@
             set { SetValue(ref this.isRefreshing, value); }
         }
 
+        public string Filter
+        {
+            get { return this.filter; }
+            set
+            {
+                SetValue(ref this.filter, value);
+                this.Search();
+            }
+        }
+        #endregion
+        #region Constructors
+        public LandsViewModel()
+        {
+            this.apiService = new ApiService();
+            this.LoadLands();
+        }
         #endregion
 
         #region Methos
@@ -71,9 +84,24 @@
                 await Application.Current.MainPage.Navigation.PopAsync();
                 return;
             }
-            var list = (List<Land>)response.Result;
-            this.Lands = new ObservableCollection<Land>(list);
+            landsList = (List<Land>)response.Result;
+            this.Lands = new ObservableCollection<Land>(this.landsList);
             this.IsRefreshing = false;
+        }
+
+
+        private void Search()
+        {
+            if(string.IsNullOrEmpty(this.Filter))
+            {
+                this.Lands = new ObservableCollection<Land>(this.landsList);
+            }
+            else
+            {
+                this.Lands = new ObservableCollection<Land>(
+                    this.landsList.Where(l => l.Name.ToLower().Contains(this.Filter.ToLower()) ||
+                                              l.Capital.ToLower().Contains(this.Filter.ToLower())));
+            }
         }
         #endregion
 
@@ -85,6 +113,15 @@
                 return new RelayCommand(LoadLands);
             }
         }
+
+        public ICommand SearchCommand
+        {
+            get
+            {
+                return new RelayCommand(Search);
+            }
+        }
+
         #endregion
     }
 }
